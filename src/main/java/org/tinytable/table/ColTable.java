@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ColTable {
 
-	public ColTable(String na, String pa) throws IOException {
+	public ColTable(String na, String pa) throws IOException, ClassNotFoundException {
 		// TODO Auto-generated constructor stub
 		name = na;
 		path = pa;
@@ -53,9 +56,7 @@ public class ColTable {
 			SSTable sst = new SSTable();
 			sst.setName(str);
 			sst.setPath(path + name + "/");
-			System.out.println(parts[1]);
 			int sstNum = Integer.parseInt(parts[1]);
-			System.out.println(sstNum);
 			if (parts[0].equals("lv1")) {
 				lvOneOpenSstList.add(sst);
 				lv1Flag[sstNum] = false;
@@ -77,9 +78,16 @@ public class ColTable {
 	}
 	
 	
-	public SSTable getFreeSST() throws IOException {
+	public SSTable getFreeSST() throws IOException, ClassNotFoundException {
 		// if empty do minor compaction
 		if (lvOneFreeSstList.isEmpty()) {
+			System.out.println("start compaction!");
+			Compaction lvOneCom = new Compaction(this);
+			lvOneCom.mergeData();
+			lvOneOpenSstList.clear();
+			for (int i = 0; i < lvOneNum; i++)
+				lvOneFreeSstList.add(i);
+			System.out.println("lv1 size after compaction: " + lvOneFreeSstList.size());
 			return getFreeSST();
 		}
 		else {
@@ -93,17 +101,36 @@ public class ColTable {
 		}
 	}
 	
-	public String put(String k, String v) throws IOException {
-		return memT.put(k, v);
+	public SSTable getLvTwoFreeSST() throws IOException {
+		int sstNum = lvTwoFreeSstList.poll();
+		SSTable sst = new SSTable();
+		sst.setPath(path + name + "/");
+		sst.setName("lv2-" + sstNum);
+		sst.initializeCreate();
+		lvTwoOpenSstList.add(sst);
+		return sst;
+	}
+	
+	public String put(String k, String v) throws IOException, ClassNotFoundException {
+		writeLock.lock();
+		String res = memT.put(k, v);
+		writeLock.unlock();
+		return res;
 	}
 	
 	public String get(String k) throws ClassNotFoundException, IOException {
+		readLock.lock();
 		String strM = memT.get(k);
-		if (strM != null)
-			return null;
+		if (strM != null) {
+			readLock.unlock();
+			return strM;
+		}
 		String strLvOne = combineLvRes(k, lvOneOpenSstList);
-		if (strLvOne != null)
+		if (strLvOne != null) {
+			readLock.unlock();
 			return strLvOne;
+		}
+		readLock.unlock();
 		return combineLvRes(k, lvTwoOpenSstList);
 	}
 	
@@ -128,7 +155,11 @@ public class ColTable {
 			return tmpEntry.v;
 	}
 	
-	public void close() throws IOException {
+	public LinkedList<SSTable> getCompactionList() {
+		return lvOneOpenSstList;
+	}
+	
+	public void close() throws IOException, ClassNotFoundException {
 		memT.close();
 	}
 	
@@ -137,11 +168,14 @@ public class ColTable {
 	private String path;
 	private LinkedList<SSTable> lvOneOpenSstList;
 	private LinkedList<SSTable> lvTwoOpenSstList;
-	private LinkedList<Integer> lvOneFreeSstList;
+	public LinkedList<Integer> lvOneFreeSstList;
 	private LinkedList<Integer> lvTwoFreeSstList;
 	private int lvOneNum = 10;
-	private int lvTwoNum = 10;
+	private int lvTwoNum = 100;
 	private MemTable memT;
+	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+	private final Lock readLock = readWriteLock.readLock();
+	private final Lock writeLock = readWriteLock.writeLock();
 	
 
 }

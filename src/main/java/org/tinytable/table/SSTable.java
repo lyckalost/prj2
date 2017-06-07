@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.tinytable.db.ObjectSizeFetcher;
 
@@ -33,7 +34,7 @@ public class SSTable {
 	
 	public void initializeCreate() throws IOException {
 		sstFile = new RandomAccessFile(getFullPath(), "rw");
-		sstFile.setLength(BLOCKNUM * BLOCKSIZE);
+//		sstFile.setLength(BLOCKNUM * BLOCKSIZE);
 	}
 	
 	public void initializeReload() throws IOException, ClassNotFoundException {
@@ -76,6 +77,7 @@ public class SSTable {
 		ObjectInputStream ois = new ObjectInputStream(bis);
 		ArrayList<BlockEntry> blockEntryAr = new ArrayList<BlockEntry>();
 		int blockEntryNum = metaBlockAr.get(blockIndex).entryNum;
+//		System.out.println("reading datablock i: " + blockIndex + " of entry Num: " + blockEntryNum);
 		for (int i = 0; i < blockEntryNum; i++) {
 			BlockEntry dataEntry = (BlockEntry)ois.readObject();
 			blockEntryAr.add(dataEntry);
@@ -93,6 +95,15 @@ public class SSTable {
 			dataAr.addAll(blockDataAr);
 		}
 		return dataAr;
+	}
+	
+	public LinkedList<BlockEntry> readAllDataToLinkedList() throws ClassNotFoundException, IOException {
+		LinkedList<BlockEntry> dataList = new LinkedList<BlockEntry>();
+		for (int i = 0; i < blockCounter; i++) {
+			ArrayList<BlockEntry> blockDataAr = readDataBlock(i);
+			dataList.addAll(blockDataAr);
+		}
+		return dataList;	
 	}
 	
 	public String get(String key) throws ClassNotFoundException, IOException {
@@ -163,7 +174,6 @@ public class SSTable {
 	}
 	
 	public void writeMemTableToSST(ArrayList<BlockEntry> kvArray) throws IOException {
-		initializeCreate();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		BlockHandler bHandler = new BlockHandler(this);
@@ -180,7 +190,6 @@ public class SSTable {
 															  blockEndIndex - blockStartIndex + 1);
 				metaBlockAr.add(metaEntry);
 				blockStartIndex = blockEndIndex + 1;
-				System.out.println("block byte size: " + bos.size() + " block entry num: " + metaEntry.entryNum);
 				byte[] blockBUF = bos.toByteArray();
 				bHandler.writeDataBlock(blockBUF);
 				
@@ -193,7 +202,6 @@ public class SSTable {
 			}
 		}
 		if (blockStartIndex < kvArray.size() && bos.size() > 0) {
-			System.out.println("last block byte size: " + bos.size());
 			blockCounter++;
 			blockEndIndex = kvArray.size() - 1;
 			MetaBlockEntry metaEntry = new MetaBlockEntry(kvArray.get(blockStartIndex).k, 
@@ -201,6 +209,7 @@ public class SSTable {
 					  									  bos.size(),
 					  									  blockEndIndex - blockStartIndex + 1);
 			metaBlockAr.add(metaEntry);
+			System.out.println("block num: " + metaBlockAr.size() + " last block size: " + bos.size());
 			for (int i = blockStartIndex; i <= blockEndIndex; i++)
 				oos.writeObject(kvArray.get(i));
 			
@@ -218,7 +227,7 @@ public class SSTable {
 	private String sstPath;
 	public int BLOCKSIZE = 4 * 1024; // 4K bytes block
 	private ArrayList<MetaBlockEntry> metaBlockAr;
-	private int BLOCKNUM = 128;
+	private int BLOCKNUM = 64;
 	private int blockCounter;
 	private RandomAccessFile sstFile;
 

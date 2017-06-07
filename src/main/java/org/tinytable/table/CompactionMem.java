@@ -1,24 +1,20 @@
 package org.tinytable.table;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 
 import org.tinytable.db.ObjectSizeFetcher;
 
-public class MemTable {
+public class CompactionMem {
 
-	public MemTable() {
+	public CompactionMem(Compaction pc) {
 		// TODO Auto-generated constructor stub
+		parentCom = pc;
 		kvMap = new HashMap<String, BlockEntry>();
 		bos = new ByteArrayOutputStream();
 		try {
@@ -29,48 +25,18 @@ public class MemTable {
 		}
 	}
 	
-	public MemTable(ColTable colT) throws IOException, ClassNotFoundException {
-		// TODO Auto-generated constructor stub
-		kvMap = new HashMap<String, BlockEntry>();
-		bos = new ByteArrayOutputStream();
-		try {
-			oos = new ObjectOutputStream(bos);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		parentColTable = colT;
-	}
 	
 	public void getDumpSST(SSTable sst) {
 		nextDumpSST = sst;
 	}
 	
-	public String get(String key) {
-		readLock.lock();
-		if (!kvMap.containsKey(key)) {
-			readLock.unlock();
-			return null;
-		}
-		else {
-			readLock.unlock();
-			return kvMap.get(key).v;
-		}
-	}
-	
-	public String put(String key, String value) throws IOException, ClassNotFoundException {
-		writeLock.lock();
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		long timeLong = timestamp.getTime();
-		
-		BlockEntry entry = new BlockEntry(key, value, timeLong);
-		updateSize(key, entry);
-		kvMap.put(key, entry);
+	public String put(BlockEntry entry) throws IOException {	
+		updateSize(entry.k, entry);
+		kvMap.put(entry.k, entry);
 		if (isFull()) {
 			dumpToFile();
 		}
-		writeLock.unlock();
-		return value;
+		return entry.v;
 	}
 	
 	private void updateSize(String key, BlockEntry entry) throws IOException {
@@ -85,14 +51,15 @@ public class MemTable {
 		return estimateSize >= (MemTableSize - 2 * BLOCKSIZE);
 	}
 	
-	
-	private void dumpToFile() throws IOException, ClassNotFoundException {
-		if (nextDumpSST == null && parentColTable != null)
-			getDumpSST(parentColTable.getFreeSST());
+	private void dumpToFile() throws IOException {
+		if (nextDumpSST == null && parentCom != null)
+			getDumpSST(parentCom.getFreeSST());
 		ArrayList<BlockEntry> kvArray = new ArrayList<BlockEntry>();
 		convertMapToArray(kvArray);
 		nextDumpSST.writeMemTableToSST(kvArray);
+		
 		clearMemTableNow();
+		System.out.println("dumping compaction file!");
 	}
 	
 	private void clearMemTableNow() throws IOException {
@@ -113,20 +80,17 @@ public class MemTable {
 		Collections.sort(kvArray);
 	}
 	
-	public void close() throws IOException, ClassNotFoundException {
+	public void close() throws IOException {
 		dumpToFile();
 	}
 	
+
+	private Compaction parentCom;
 	private HashMap<String, BlockEntry> kvMap;
 	private int BLOCKSIZE = 4 * 1024;
 	private int estimateSize = 0;
 	private int MemTableSize = 64 * BLOCKSIZE; //size in bytes
 	private SSTable nextDumpSST;
-	private ColTable parentColTable;
 	private ByteArrayOutputStream bos;
 	private ObjectOutputStream oos;
-	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-	private final Lock readLock = readWriteLock.readLock();
-	private final Lock writeLock = readWriteLock.writeLock();
-
 }

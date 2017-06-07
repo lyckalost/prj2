@@ -39,7 +39,6 @@ public class BlockHandler {
 	}
 	
 	public void writeHeaderBlock(int blockCounter) throws IOException {
-		System.out.println("actual block num: " + blockCounter);
 		RandomAccessFile file = belongSST.getSSTFile();
 		file.seek(0);
 		byte[] buf = ByteBuffer.allocate(4).putInt(blockCounter).array();
