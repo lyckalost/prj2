@@ -84,6 +84,9 @@ public class ColTable {
 			System.out.println("start compaction!");
 			Compaction lvOneCom = new Compaction(this);
 			lvOneCom.mergeData();
+			for (SSTable entry : lvOneOpenSstList) {
+				entry.recycleLvTable();
+			}
 			lvOneOpenSstList.clear();
 			for (int i = 0; i < lvOneNum; i++)
 				lvOneFreeSstList.add(i);

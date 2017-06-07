@@ -2,6 +2,7 @@ package org.tinytable.table;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -221,6 +222,11 @@ public class SSTable {
 		
 		bHandler.writeMetaBlock(metaBlockAr);
 		bHandler.writeHeaderBlock(blockCounter);
+	}
+	
+	public boolean recycleLvTable() {
+		File delF = new File(this.getFullPath());
+		return delF.delete();
 	}
 	
 	private String sstName;
