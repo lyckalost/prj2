@@ -12,10 +12,12 @@ import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 
+import org.tinytable.table.BlockEntry;
 import org.xerial.snappy.Snappy;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 import java.lang.instrument.Instrumentation;
 
 public class DBTest {
@@ -194,9 +196,19 @@ public class DBTest {
 	*/
 	
 	public static void main(String[] args) {
-		File dir = new File("/tmp/tiny/table1/col1");
-		for (String str : dir.list())
-			System.out.println(str);
+		BlockEntry entry1 = new BlockEntry("abc", "123", 1);
+		BlockEntry entry2 = new BlockEntry("abc", "234", 2);
+		BlockEntry entry3 = new BlockEntry("def", "345", 3);
+		PriorityQueue<BlockEntry> pqEntry = new PriorityQueue<BlockEntry>();
+		pqEntry.add(entry1);
+		pqEntry.add(entry2);
+		pqEntry.add(entry3);
+		BlockEntry tmp = pqEntry.poll();
+		System.out.println(tmp.k + " " + tmp.v + " " + tmp.v);
+		tmp = pqEntry.poll();
+		System.out.println(tmp.k + " " + tmp.v + " " + tmp.v);
+		tmp = pqEntry.poll();
+		System.out.println(tmp.k + " " + tmp.v + " " + tmp.v);
 	}
 
 }

@@ -218,7 +218,7 @@ public class SSTable {
 	private String sstPath;
 	public int BLOCKSIZE = 4 * 1024; // 4K bytes block
 	private ArrayList<MetaBlockEntry> metaBlockAr;
-	private int BLOCKNUM = 16;
+	private int BLOCKNUM = 128;
 	private int blockCounter;
 	private RandomAccessFile sstFile;
 

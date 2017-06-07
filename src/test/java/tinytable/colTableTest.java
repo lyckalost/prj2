@@ -28,7 +28,7 @@ public class colTableTest {
 	public void test1() throws IOException, ClassNotFoundException {
 		ColTable colT = new ColTable("col1", "/tmp/tiny/table1/");
 		HashMap<String, String> kvMap = new HashMap<String, String>();
-		int testNum = 5000;
+		int testNum = 20000;
 		for (int i = 0; i < testNum; i++) {
 			String tmpK = genRandomString();
 			String tmpV = genRandomString();

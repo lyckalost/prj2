@@ -73,7 +73,7 @@ public class MemTable {
 	}
 	
 	public boolean isFull() {
-		return estimateSize >= (MemTableSize - 2 * BLOCKSIZE) * 0.99;
+		return estimateSize >= (MemTableSize - 2 * BLOCKSIZE);
 	}
 	
 	
@@ -113,7 +113,7 @@ public class MemTable {
 	private HashMap<String, BlockEntry> kvMap;
 	private int BLOCKSIZE = 4 * 1024;
 	private int estimateSize = 0;
-	private int MemTableSize = 16 * BLOCKSIZE; //size in bytes
+	private int MemTableSize = 128 * BLOCKSIZE; //size in bytes
 	private SSTable nextDumpSST;
 	private ColTable parentColTable;
 	private ByteArrayOutputStream bos;

@@ -80,7 +80,6 @@ public class ColTable {
 	public SSTable getFreeSST() throws IOException {
 		// if empty do minor compaction
 		if (lvOneFreeSstList.isEmpty()) {
-			;
 			return getFreeSST();
 		}
 		else {
