@@ -210,7 +210,7 @@ public class SSTable {
 					  									  bos.size(),
 					  									  blockEndIndex - blockStartIndex + 1);
 			metaBlockAr.add(metaEntry);
-			System.out.println("block num: " + metaBlockAr.size() + " last block size: " + bos.size());
+//			System.out.println("block num: " + metaBlockAr.size() + " last block size: " + bos.size());
 			for (int i = blockStartIndex; i <= blockEndIndex; i++)
 				oos.writeObject(kvArray.get(i));
 			

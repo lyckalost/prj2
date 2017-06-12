@@ -59,7 +59,7 @@ public class CompactionMem {
 		nextDumpSST.writeMemTableToSST(kvArray);
 		
 		clearMemTableNow();
-		System.out.println("dumping compaction file!");
+//		System.out.println("dumping compaction file!");
 	}
 	
 	private void clearMemTableNow() throws IOException {

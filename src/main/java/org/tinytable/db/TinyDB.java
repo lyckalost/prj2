@@ -42,7 +42,8 @@ public class TinyDB {
 		}
 	}
 	
-	public static TinyTable createTable(String tableName) throws IOException, ClassNotFoundException {
+	//this is not a static???
+	public TinyTable createTable(String tableName) throws IOException, ClassNotFoundException {
 		if (tableMap.containsKey(tableName))
 			return tableMap.get(tableName);
 		TinyTable newTable = new TinyTable(this, tableName);
