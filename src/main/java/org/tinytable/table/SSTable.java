@@ -29,6 +29,9 @@ public class SSTable {
 	public void setPath(String path) {
 		sstPath = path;
 	}
+	public void setBelongColT(ColTable colT) {
+		belongColT = colT;
+	}
 	public String getFullPath() {
 		return sstPath + sstName;
 	}
@@ -79,9 +82,17 @@ public class SSTable {
 		byte[] buf = new byte[BLOCKSIZE];
 		file.read(buf);
 		
+		ArrayList<BlockEntry> blockEntryAr;
+		if (belongColT != null) {
+			String bPath = getFullPath() + Integer.toString(blockIndex);
+			blockEntryAr = belongColT.getCachedData(bPath);
+			if (blockEntryAr != null)
+				return blockEntryAr;
+		}
+		
 		ByteArrayInputStream bis = new ByteArrayInputStream(buf);
 		ObjectInputStream ois = new ObjectInputStream(bis);
-		ArrayList<BlockEntry> blockEntryAr = new ArrayList<BlockEntry>();
+		blockEntryAr = new ArrayList<BlockEntry>();
 		int blockEntryNum = metaBlockAr.get(blockIndex).entryNum;
 //		System.out.println("reading datablock i: " + blockIndex + " of entry Num: " + blockEntryNum);
 		for (int i = 0; i < blockEntryNum; i++) {
@@ -90,6 +101,11 @@ public class SSTable {
 		}
 		bis.close();
 		ois.close();
+		if (belongColT != null) {
+			String bPath = getFullPath() + Integer.toString(blockIndex);
+			belongColT.putIntoBlockCache(bPath, blockEntryAr);
+		}
+		
 		return blockEntryAr;
 	}
 	
@@ -253,5 +269,6 @@ public class SSTable {
 	private int blockCounter;
 	private RandomAccessFile sstFile;
 	private BloomFilter sstBLF;
+	private ColTable belongColT;
 
 }

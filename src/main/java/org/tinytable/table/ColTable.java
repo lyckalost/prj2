@@ -18,6 +18,7 @@ public class ColTable {
 		lvTwoOpenSstList = new LinkedList<SSTable>();
 		lvOneFreeSstList = new LinkedList<Integer>();
 		lvTwoFreeSstList = new LinkedList<Integer>();
+		colBlockCache = new BlockCache(256);
 		
 		String abPath = path + name;
 		File dir = new File(abPath);
@@ -56,6 +57,7 @@ public class ColTable {
 			SSTable sst = new SSTable();
 			sst.setName(str);
 			sst.setPath(path + name + "/");
+			sst.setBelongColT(this);
 			int sstNum = Integer.parseInt(parts[1]);
 			if (parts[0].equals("lv1")) {
 				lvOneOpenSstList.add(sst);
@@ -98,6 +100,7 @@ public class ColTable {
 			SSTable sst = new SSTable();
 			sst.setPath(path + name + "/");
 			sst.setName("lv1-" + sstNum);
+			sst.setBelongColT(this);
 			sst.initializeCreate();
 			lvOneOpenSstList.add(sst);
 			return sst;
@@ -109,6 +112,7 @@ public class ColTable {
 		SSTable sst = new SSTable();
 		sst.setPath(path + name + "/");
 		sst.setName("lv2-" + sstNum);
+		sst.setBelongColT(this);
 		sst.initializeCreate();
 		lvTwoOpenSstList.add(sst);
 		return sst;
@@ -166,6 +170,19 @@ public class ColTable {
 		memT.close();
 	}
 	
+	public void putIntoBlockCache(String bPath, ArrayList<BlockEntry> blockEntryAr) {
+		
+		BlockData bData = new BlockData(bPath, blockEntryAr);
+		colBlockCache.putBlockData(bData);
+	}
+	
+	public ArrayList<BlockEntry> getCachedData(String bPath) {
+		BlockData bData = colBlockCache.getBlockData(bPath);
+		if (bData == null)
+			return null;
+		else
+			return bData.cachedDataList;
+	}
 	
 	private String name;
 	private String path;
@@ -179,6 +196,7 @@ public class ColTable {
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 	private final Lock readLock = readWriteLock.readLock();
 	private final Lock writeLock = readWriteLock.writeLock();
+	private BlockCache colBlockCache;
 	
 
 }
