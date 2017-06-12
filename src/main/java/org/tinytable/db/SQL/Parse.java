@@ -25,6 +25,7 @@ public class Parse {
                 result = SELECT.parse(args, td).toString();
                 break;
             case INSERT:
+                result = INSERT.parse(args, td).toString();
                 break;
             case DELETE:
                 break;
