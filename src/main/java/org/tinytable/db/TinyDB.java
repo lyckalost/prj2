@@ -42,6 +42,7 @@ public class TinyDB {
 		}
 	}
 	
+
 	public TinyTable createTable(String tableName) throws IOException, ClassNotFoundException {
 		if (tableMap.containsKey(tableName))
 			return tableMap.get(tableName);

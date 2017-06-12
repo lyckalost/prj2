@@ -77,7 +77,15 @@ public class BloomFilter {
         return true;
     }
 
-
+    public byte[] getBloomFilterArray() {
+    	return this.set;
+    }
+    
+    
+    public void synchrWithByteArray(byte[] buf) {
+    	for (int i = 0; i < set.length; i++)
+    		set[i] = buf[i];
+    }
 
 
 }
