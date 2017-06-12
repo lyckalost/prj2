@@ -1,11 +1,12 @@
 package org.tinytable.db;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class TinyTable {
 
-	public TinyTable(TinyDB db, String name) {
+	public TinyTable(TinyDB db, String name) throws IOException, ClassNotFoundException {
 		// TODO Auto-generated constructor stub
 		upperDB = db;
 		tableName = name;
@@ -26,14 +27,14 @@ public class TinyTable {
 		}
 	}
 	
-	private void loadTableInfo(File dir) {
+	private void loadTableInfo(File dir) throws IOException, ClassNotFoundException {
 		String[] colList = dir.list();
 		for (int i = 0; i < colList.length; i++) {
 			colMap.put(colList[i], createCol(colList[i]));
 		}
 	}
 	
-	public TinyCol createCol(String colName) {
+	public TinyCol createCol(String colName) throws IOException, ClassNotFoundException {
 		if (colMap.containsKey(colName))
 			return colMap.get(colName);
 		TinyCol newCol = new TinyCol(this, colName);
@@ -48,8 +49,16 @@ public class TinyTable {
 		return tableName;
 	}
 
+	/*
+	public TinyCol getColumn(String colName){
+		if(colMap.containsKey(colName))
+			return colMap.get(colName);
+		else return null;
+
+	}*/
+
 	private TinyDB upperDB;
 	private String tableName;
 	private String tablePath;
-	private HashMap<String, TinyCol> colMap;
+	private static HashMap<String, TinyCol> colMap;
 }

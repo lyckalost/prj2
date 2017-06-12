@@ -13,7 +13,7 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 
 import org.tinytable.table.BlockEntry;
-import org.xerial.snappy.Snappy;
+//import org.xerial.snappy.Snappy;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
