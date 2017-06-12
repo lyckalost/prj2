@@ -10,10 +10,5 @@ public class Grammer {
         SELECT, DELETE, INSERT, UPDATE, CREATE, NULL
     }
 
-    public enum CREATE {
-
-        TABLESPASE, NULL
-    }
-
 
 }
