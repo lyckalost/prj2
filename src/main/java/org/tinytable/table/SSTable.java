@@ -20,7 +20,7 @@ public class SSTable {
 		// TODO Auto-generated constructor stub
 		metaBlockAr = new ArrayList<MetaBlockEntry>();
 		blockCounter = 0;
-		
+		sstBLF = new BloomFilter(BLOCKSIZE / 2, 7);
 	}
 	
 	public void setName(String name) {
@@ -51,6 +51,11 @@ public class SSTable {
 		byte[] buf = new byte[32];
 		file.read(buf);
 		blockCounter = ByteBuffer.wrap(buf).getInt();
+		
+		file.seek(BLOCKSIZE / 2);
+		byte[] blfBuf = new byte[BLOCKSIZE / 2];
+		file.read(blfBuf);
+		sstBLF.synchrWithByteArray(blfBuf);
 	}
 	
 	private void readMetaBlock() throws IOException, ClassNotFoundException {
@@ -175,6 +180,9 @@ public class SSTable {
 	}
 	
 	public void writeMemTableToSST(ArrayList<BlockEntry> kvArray) throws IOException {
+		for (int i = 0; i < kvArray.size(); i++)
+			sstBLF.add(kvArray.get(i));
+		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		BlockHandler bHandler = new BlockHandler(this);
@@ -229,6 +237,10 @@ public class SSTable {
 		return delF.delete();
 	}
 	
+	public BloomFilter getBloomFilter() {
+		return sstBLF;
+	}
+	
 	private String sstName;
 	private String sstPath;
 	public int BLOCKSIZE = 4 * 1024; // 4K bytes block
@@ -236,5 +248,6 @@ public class SSTable {
 	private int BLOCKNUM = 64;
 	private int blockCounter;
 	private RandomAccessFile sstFile;
+	private BloomFilter sstBLF;
 
 }

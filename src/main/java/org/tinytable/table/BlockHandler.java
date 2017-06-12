@@ -43,6 +43,9 @@ public class BlockHandler {
 		file.seek(0);
 		byte[] buf = ByteBuffer.allocate(4).putInt(blockCounter).array();
 		file.write(buf);
+		file.seek(BLOCKSIZE / 2);
+		byte[] blfBuf = belongSST.getBloomFilter().getBloomFilterArray();
+		file.write(blfBuf);
 	}
 	
 	public SSTable belongSST;
