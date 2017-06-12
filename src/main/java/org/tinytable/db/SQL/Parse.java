@@ -3,7 +3,7 @@ package org.tinytable.db.SQL;
 /**
  * Created by andy on 6/11/17.
  */
-import org.tinytable.db.SQL.Grammer.*;
+import org.tinytable.db.SQL.Grammar.*;
 import org.tinytable.db.TinyDB;
 
 import java.io.IOException;
@@ -13,12 +13,12 @@ public class Parse {
         String[] args = query.split("\\s+");
         String beginString = args[0];
         String result = "";
-        grammer g = null;
+        grammar g = null;
         try {
 
-            g = grammer.valueOf(beginString.toUpperCase());
+            g = grammar.valueOf(beginString.toUpperCase());
         } catch (IllegalArgumentException e) {
-            g = grammer.NULL;
+            g = grammar.NULL;
         }
         switch(g){
             case SELECT:
