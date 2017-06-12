@@ -39,7 +39,9 @@ public class TinyCol {
 		return colTable.get(key);
 	}
 
-
+	public String put(String key, String value) throws IOException, ClassNotFoundException {
+		return colTable.put(key, value);
+	}
 
 
 
