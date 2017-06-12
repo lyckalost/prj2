@@ -35,7 +35,7 @@ public class SSTable {
 	
 	public void initializeCreate() throws IOException {
 		sstFile = new RandomAccessFile(getFullPath(), "rw");
-//		sstFile.setLength(BLOCKNUM * BLOCKSIZE);
+		sstFile.setLength(BLOCKNUM * BLOCKSIZE);
 	}
 	
 	public void initializeReload() throws IOException, ClassNotFoundException {

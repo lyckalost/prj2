@@ -17,7 +17,7 @@ public class TableTest {
 
 	public String genRandomString() {
 		Random rn = new Random();
-		int len = rn.nextInt(10) + 1;
+		int len = rn.nextInt(6) + 1;
 		String str = new String();
 		for (int i = 0; i < len; i++) {
 			char c = (char)(rn.nextInt(26) + (int)('a'));
@@ -86,9 +86,9 @@ public class TableTest {
 	public void sstAllDataTest1() throws IOException, ClassNotFoundException {
 		MemTable memT = new MemTable();
 		SSTable ssT = new SSTable();
-		ssT.initializeCreate();
 		ssT.setName("temp1");
 		ssT.setPath("/tmp/tiny/table1/col1/");
+		ssT.initializeCreate();
 		HashMap<String, String> kvMap = new HashMap<String, String>();
 		int testNum = 5000;
 		memT.getDumpSST(ssT);
@@ -100,6 +100,7 @@ public class TableTest {
 			if (memT.isFull())
 				break;
 		}
+		memT.close();
 		ssT.initializeReload();
 		ArrayList<BlockEntry> dataAr = ssT.readAllData();
 		for (BlockEntry entry : dataAr) {

@@ -16,7 +16,7 @@ public class colTableTest {
 
 	public String genRandomString() {
 		Random rn = new Random();
-		int len = rn.nextInt(10) + 1;
+		int len = rn.nextInt(6) + 1;
 		String str = new String();
 		for (int i = 0; i < len; i++) {
 			char c = (char)(rn.nextInt(26) + (int)('a'));
