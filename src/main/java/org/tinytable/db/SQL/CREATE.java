@@ -16,10 +16,10 @@ import static org.junit.Assert.assertEquals;
  * Created by andy on 6/11/17.
  */
 public class CREATE {
-    public static TinyTable create(String name) throws IOException, ClassNotFoundException{
+    public static TinyTable create(String name, TinyDB td) throws IOException, ClassNotFoundException{
         TinyTable table = null;
     try {
-        table = TinyDB.createTable(name);
+        table = td.createTable(name);
     }catch (NullPointerException | IllegalArgumentException e) {
         throw new NullPointerException();
     }

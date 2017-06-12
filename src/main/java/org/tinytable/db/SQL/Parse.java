@@ -31,7 +31,9 @@ public class Parse {
             case UPDATE:
                 break;
             case CREATE:
-                CREATE.create(args[1]);
+                CREATE c = new CREATE();
+                result = c.create(args[1], td).getTableName();
+                break;
             default:
                 result = "Unknown Command: " + beginString;
                 break;

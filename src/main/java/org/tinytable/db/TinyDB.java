@@ -42,7 +42,7 @@ public class TinyDB {
 		}
 	}
 	
-	public static TinyTable createTable(String tableName) throws IOException, ClassNotFoundException {
+	public TinyTable createTable(String tableName) throws IOException, ClassNotFoundException {
 		if (tableMap.containsKey(tableName))
 			return tableMap.get(tableName);
 		TinyTable newTable = new TinyTable(this, tableName);
@@ -59,6 +59,6 @@ public class TinyDB {
 	//4MB memtableSize
 	private final int memtableSize = (4 << 20);
 	private final int sstableSize = (4 << 20);
-	private HashMap<String, TinyTable> tableMap;
+	private static HashMap<String, TinyTable> tableMap;
 	
 }
