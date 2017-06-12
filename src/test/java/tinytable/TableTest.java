@@ -71,12 +71,21 @@ public class TableTest {
 			MetaBlockEntry oldEntry = new MetaBlockEntry(entry.startKey, entry.endKey, entry.bufSize, entry.entryNum);
 			oldMetaInfo.add(oldEntry);
 		}
+		byte[] oldBlfAr = ssT.getBloomFilter().getBloomFilterArray();
 		//reloading ssT
 		ssT.initializeReload();
 		
+		byte[] newBlfAr = ssT.getBloomFilter().getBloomFilterArray();
+		
+		// test bloom filter write and load successfully
+		assertArrayEquals(oldBlfAr, newBlfAr);
+		assertEquals(oldBlfAr.length, newBlfAr.length);
+		
 		int newBlockCounter = ssT.getBlockCounter();
 		ArrayList<MetaBlockEntry> newMetaInfo = ssT.getMetaInfo();
+		// test block counter in the header
 		assertEquals(oldBlockCounter, newBlockCounter);
+		// test meta data write and load 
 		assertEquals(oldMetaInfo.size(), newMetaInfo.size());
 		for (int i = 0; i < newBlockCounter; i++) {
 			MetaBlockEntry oe = oldMetaInfo.get(i);

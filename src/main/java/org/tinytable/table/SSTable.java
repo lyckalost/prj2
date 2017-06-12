@@ -113,6 +113,8 @@ public class SSTable {
 	}
 	
 	public String get(String key) throws ClassNotFoundException, IOException {
+		if (!sstBLF.contains(key))
+			return null;
 		int blockIndex = locateBlock(key);;
 		if (blockIndex == -1) {
 			return null;
@@ -126,6 +128,8 @@ public class SSTable {
 	}
 	
 	public BlockEntry getEntry(String key) throws ClassNotFoundException, IOException {
+		if (!sstBLF.contains(key))
+			return null;
 		int blockIndex = locateBlock(key);;
 		if (blockIndex == -1) {
 			return null;
@@ -181,7 +185,7 @@ public class SSTable {
 	
 	public void writeMemTableToSST(ArrayList<BlockEntry> kvArray) throws IOException {
 		for (int i = 0; i < kvArray.size(); i++)
-			sstBLF.add(kvArray.get(i));
+			sstBLF.add(kvArray.get(i).k);
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bos);

@@ -51,7 +51,7 @@ public class BloomFilter {
         return Math.abs(new BigInteger(1, md.digest()).intValue()) % (set.length - 1);
     }
 
-    private int[] getSetArray(BlockEntry entry)
+    private int[] getSetArray(String entry)
     {
         int[] tmpset = new int[keySize];
         tmpset[0] = getHash(entry.hashCode());
@@ -60,7 +60,7 @@ public class BloomFilter {
         return tmpset;
     }
 
-    public void add(BlockEntry entry) {
+    public void add(String entry) {
         int[] tmpset = getSetArray(entry);
         for (int i : tmpset)
             set[i] = 1;
@@ -68,7 +68,7 @@ public class BloomFilter {
     }
 
 
-    public boolean contains(BlockEntry entry)
+    public boolean contains(String entry)
     {
         int[] tmpset = getSetArray(entry);
         for (int i : tmpset)
