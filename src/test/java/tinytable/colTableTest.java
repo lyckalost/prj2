@@ -54,7 +54,7 @@ public class colTableTest {
 		colT.close();
 		Instant end = Instant.now();
 		long delta = Duration.between(start, end).toMillis();
-		System.out.println("Small IO 10000 write time: " + delta);
+		System.out.println("Small IO 10000 write time:" + delta);
 		
 		start = Instant.now();
 		for (String key : kvMap.keySet()) {
@@ -62,7 +62,7 @@ public class colTableTest {
 		}
 		end = Instant.now();
 		delta = Duration.between(start, end).toMillis();
-		System.out.println("Small IO 10000 read time: " + delta);
+		System.out.println("Small IO 10000 read time:" + delta);
 		System.out.println("");
 	}	
 
@@ -83,7 +83,7 @@ public class colTableTest {
 		colT.close();
 		Instant end = Instant.now();
 		long delta = Duration.between(start, end).toMillis();
-		System.out.println("Small IO 20000 write time: " + delta);
+		System.out.println("Small IO 20000 write time:" + delta);
 		
 		start = Instant.now();
 		for (String key : kvMap.keySet()) {
@@ -91,7 +91,7 @@ public class colTableTest {
 		}
 		end = Instant.now();
 		delta = Duration.between(start, end).toMillis();
-		System.out.println("Small IO 20000 read time: " + delta);
+		System.out.println("Small IO 20000 read time:" + delta);
 		System.out.println("");
 	}
 	
@@ -111,7 +111,7 @@ public class colTableTest {
 		colT.close();
 		Instant end = Instant.now();
 		long delta = Duration.between(start, end).toMillis();
-		System.out.println("IO 40000 without compaction write time: " + delta);
+		System.out.println("IO 40000 without compaction write time:" + delta);
 		
 		start = Instant.now();
 		for (String key : kvMap.keySet()) {
@@ -119,7 +119,35 @@ public class colTableTest {
 		}
 		end = Instant.now();
 		delta = Duration.between(start, end).toMillis();
-		System.out.println("IO 40000 without compaction read time: " + delta);
+		System.out.println("IO 40000 without compaction read time:" + delta);
+		System.out.println("");
+	}
+	
+	@Test
+	public void testIOWithOutCompaction1() throws IOException, ClassNotFoundException {
+		clearDir("/tmp/tiny/table1/col1");
+		ColTable colT = new ColTable("col1", "/tmp/tiny/table1/");
+		HashMap<String, String> kvMap = new HashMap<String, String>();
+		int testNum = 60000;
+		Instant start = Instant.now();
+		for (int i = 0; i < testNum; i++) {
+			String tmpK = genRandomString();
+			String tmpV = genRandomString();
+			colT.put(tmpK, tmpV);
+			kvMap.put(tmpK, tmpV);
+		}
+		colT.close();
+		Instant end = Instant.now();
+		long delta = Duration.between(start, end).toMillis();
+		System.out.println("IO 60000 without compaction write time:" + delta);
+		
+		start = Instant.now();
+		for (String key : kvMap.keySet()) {
+			assertEquals(kvMap.get(key), colT.get(key));
+		}
+		end = Instant.now();
+		delta = Duration.between(start, end).toMillis();
+		System.out.println("IO 60000 without compaction read time:" + delta);
 		System.out.println("");
 	}
 	
@@ -139,7 +167,7 @@ public class colTableTest {
 		colT.close();
 		Instant end = Instant.now();
 		long delta = Duration.between(start, end).toMillis();
-		System.out.println("Large IO 80000  write time: " + delta);
+		System.out.println("Large IO 80000  write time:" + delta);
 		
 		start = Instant.now();
 		for (String key : kvMap.keySet()) {
@@ -147,7 +175,7 @@ public class colTableTest {
 		}
 		end = Instant.now();
 		delta = Duration.between(start, end).toMillis();
-		System.out.println("Large IO 80000 read time: " + delta);
+		System.out.println("Large IO 80000 read time:" + delta);
 		System.out.println("");
 	}
 	
@@ -168,7 +196,7 @@ public class colTableTest {
 		colT.close();
 		Instant end = Instant.now();
 		long delta = Duration.between(start, end).toMillis();
-		System.out.println("Large IO 100000 with compaction write time: " + delta);
+		System.out.println("Large IO 100000 with compaction write time:" + delta);
 		
 		start = Instant.now();
 		for (String key : kvMap.keySet()) {
@@ -176,7 +204,7 @@ public class colTableTest {
 		}
 		end = Instant.now();
 		delta = Duration.between(start, end).toMillis();
-		System.out.println("Large IO 100000 with compaction read time: " + delta);
+		System.out.println("Large IO 100000 with compaction read time:" + delta);
 		System.out.println("");
 	}
 	
